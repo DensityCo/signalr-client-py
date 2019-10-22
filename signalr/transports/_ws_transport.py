@@ -1,5 +1,6 @@
 import json
 import sys
+import ssl
 
 import gevent
 
@@ -35,7 +36,8 @@ class WebSocketsTransport(Transport):
         self.ws = create_connection(ws_url,
                                     header=self.__get_headers(),
                                     cookie=self.__get_cookie_str(),
-                                    enable_multithread=True)
+                                    enable_multithread=True,
+                                    sslopt={"cert_reqs": ssl.CERT_NONE})
         self._session.get(self._get_url('start'))
 
         def _receive():
