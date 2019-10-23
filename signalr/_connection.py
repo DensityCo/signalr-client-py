@@ -38,20 +38,30 @@ class Connection:
         self.data = json.dumps([{'name': hub_name} for hub_name in self.__hubs])
 
     def increment_send_counter(self):
+        print('increment_send_counter')
         self.__send_counter += 1
         return self.__send_counter
 
     def start(self):
+        print('start.1')
         self.starting.fire()
-
+        print('start.2')
+ 
         negotiate_data = self.__transport.negotiate()
+        print('start.3')
+ 
         self.token = negotiate_data['ConnectionToken']
-
+        print('start.4')
+ 
         listener = self.__transport.start()
-
+        print('start.5')
+ 
         def wrapped_listener():
+            print('start.6')
             listener()
+            print('start.7')
             gevent.sleep()
+            print('start.8')
 
         self.__greenlet = gevent.spawn(wrapped_listener)
         self.started = True
@@ -68,10 +78,13 @@ class Connection:
 
     def register_hub(self, name):
         if name not in self.__hubs:
+            print('register_hub_1')
             if self.started:
+                print('register_hub_started')
                 raise RuntimeError(
                     'Cannot create new hub because connection is already started.')
 
+            print('register_hub_final')
             self.__hubs[name] = Hub(name, self)
         return self.__hubs[name]
 

@@ -15,7 +15,7 @@ class AutoTransport(Transport):
     def negotiate(self):
         negotiate_data = Transport.negotiate(self)
         self.__transport = self.__get_transport(negotiate_data)
-
+        print ('autotransport result: '+str(self.__transport))
         return negotiate_data
 
     def __get_transport(self, negotiate_data):
