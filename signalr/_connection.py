@@ -1,5 +1,6 @@
 import json
 import gevent
+import sys
 from signalr.events import EventHook
 from signalr.hubs import Hub
 from signalr.transports import AutoTransport
@@ -50,8 +51,12 @@ class Connection:
         listener = self.__transport.start()
 
         def wrapped_listener():
-            listener()
-            gevent.sleep()
+            try:
+                listener()
+                gevent.sleep()
+            except:
+                print("The connection is interrupted, exiting.")
+                sys.exit(1)
 
         self.__greenlet = gevent.spawn(wrapped_listener)
         self.started = True
