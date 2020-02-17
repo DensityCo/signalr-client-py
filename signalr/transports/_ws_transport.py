@@ -42,10 +42,11 @@ class WebSocketsTransport(Transport):
 
         def _receive():
             print('ws_transport: receive')
-            for notification in self.ws:
-                print('ws_transport: receive->notification')
-                self._handle_notification(notification)
-
+            while(True):
+                notification = self.ws.recv()
+                if notification is not None:
+                    print('ws_transport: receive->notification')
+                    self._handle_notification(notification)
         return _receive
 
     def send(self, data):
