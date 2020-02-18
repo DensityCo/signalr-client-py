@@ -30,5 +30,5 @@ setup(
     ],
     keywords='signalr',
     packages=find_packages(),
-    install_requires=['gevent', 'websocket-client', 'sseclient', 'requests']
+    install_requires=['gevent', 'websockets', 'sseclient', 'requests']
 )
