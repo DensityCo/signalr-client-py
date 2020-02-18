@@ -1,15 +1,14 @@
 import json
 import sys
 import ssl
-
 import gevent
 
 if sys.version_info[0] < 3:
     from urlparse import urlparse, urlunparse
 else:
     from urllib.parse import urlparse, urlunparse
-
-from websocket import create_connection
+import websockets
+import asyncio
 from ._transport import Transport
 
 
@@ -33,21 +32,24 @@ class WebSocketsTransport(Transport):
     def start(self):
         ws_url = self.__get_ws_url_from(self._get_url('connect'))
 
-        self.ws = create_connection(ws_url,
-                                    header=self.__get_headers(),
-                                    cookie=self.__get_cookie_str(),
-                                    enable_multithread=True,
-                                    sslopt={"cert_reqs": ssl.CERT_NONE})
         self._session.get(self._get_url('start'))
 
-        def _receive():
-            print('ws_transport: receive')
-            while(True):
-                notification = self.ws.recv()
-                if notification is not None:
-                    print('ws_transport: receive->notification')
-                    self._handle_notification(notification)
-        return _receive
+        print(ws_url)
+        print(self.__get_headers())
+#        ssl_context                = ssl.create_default_context()
+#        ssl_context.check_hostname = False
+#        ssl_context.verify_mode    = ssl.CERT_NONE
+
+        with websockets.connect(ws_url, extra_headers = self.__get_headers()) as self.ws:
+#        with websockets.connect(ws_url, ssl=ssl_context, extra_headers = self.__get_headers()) as self.ws:
+            def _receive():
+                print('ws_transport: receive')
+                while(True):
+                    notification = self.ws.recv()
+                    if notification is not None:
+                        print('ws_transport: receive->notification')
+                        self._handle_notification(notification)
+            return _receive
 
     def send(self, data):
         self.ws.send(json.dumps(data))
