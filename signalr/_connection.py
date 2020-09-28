@@ -68,6 +68,10 @@ class Connection:
             self.started = False
             print("Exception in %s. Setting started flag as False." %(g))
 
+        def wrapper_exception(g):
+            self.started = False
+            print("Exception in %s. Setting started flag as False." %(g))
+
         self.__greenlet = gevent.spawn(wrapped_listener)
         self.__greenlet.link_exception(wrapper_exception)
         self.started = True
