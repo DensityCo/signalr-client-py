@@ -31,6 +31,7 @@ class WebSocketsTransport(Transport):
         return urlunparse(url_data)
 
     def start(self):
+        print('ws-start')
         ws_url = self.__get_ws_url_from(self._get_url('connect'))
 
         self.ws = create_connection(ws_url,
@@ -41,14 +42,15 @@ class WebSocketsTransport(Transport):
         self._session.get(self._get_url('start'))
 
         def _receive():
-            print('ws_transport: receive')
+            print('ws-_receive')
             for notification in self.ws:
-                print('ws_transport: receive->notification')
+                print ('ws-receive-notification: '+str(notification))
                 self._handle_notification(notification)
 
         return _receive
 
     def send(self, data):
+        print('ws-send data: ',data)
         self.ws.send(json.dumps(data))
         gevent.sleep()
 
