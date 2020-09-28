@@ -1,5 +1,6 @@
 import json
 import gevent
+import sys
 from signalr.events import EventHook
 from signalr.hubs import Hub
 from signalr.transports import AutoTransport
@@ -53,11 +54,19 @@ class Connection:
             listener()
             gevent.sleep()
 
+        def wrapper_exception(g):
+            self.started = False
+            print("Exception in %s. Setting started flag as False." %(g))
+
         self.__greenlet = gevent.spawn(wrapped_listener)
+        self.__greenlet.link_exception(wrapper_exception)
         self.started = True
 
     def wait(self, timeout=30):
-        gevent.joinall([self.__greenlet], timeout)
+        if self.started == True:
+            gevent.joinall([self.__greenlet], timeout)
+        else:
+            raise Exception("Connection seems to be interrupted / reset by peer.")
 
     def send(self, data):
         self.__transport.send(data)
